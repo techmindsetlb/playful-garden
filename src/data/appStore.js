@@ -36,6 +36,30 @@ const defaultData = {
 let syncInProgress = false
 
 /**
+ * Detect if a string has corrupted UTF-8/emoji encoding
+ * (e.g., garbled multi-byte chars from buggy atob decoding)
+ */
+function hasCorruptedEncoding(text) {
+  if (typeof text !== 'string') return false
+  // Check for the Unicode replacement character (appears when UTF-8 decoding fails)
+  if (text.includes('\uFFFD')) return true
+  // Check for consecutive garbled multi-byte sequences common in Latin-1→UTF-8 corruption
+  // Corrupted emojis show as 3+ consecutive high bytes like: ðŸŒ» (corrupted 🌻)
+  if (/[\x80-\xBF]{4,}/.test(text)) return true
+  return false
+}
+
+/**
+ * Check if an array of items has corrupted emoji content
+ */
+function hasCorruptedItems(items, textFields) {
+  if (!items?.length) return false
+  return items.some(item =>
+    textFields.some(field => hasCorruptedEncoding(item[field]))
+  )
+}
+
+/**
  * Load data from localStorage (fast cache), then try to sync from GitHub
  */
 export function loadData() {
@@ -43,11 +67,16 @@ export function loadData() {
     const stored = localStorage.getItem(STORAGE_KEY)
     if (stored) {
       const parsed = JSON.parse(stored)
+      // Detect corrupted emojis and fall back to clean defaults
+      const cleanLoveNotes = (parsed.loveNotes?.length && !hasCorruptedItems(parsed.loveNotes, ['text']))
+        ? parsed.loveNotes : defaultData.loveNotes
+      const cleanQA = (parsed.qaQuestions?.length && !hasCorruptedItems(parsed.qaQuestions, ['q', 'a']))
+        ? parsed.qaQuestions : defaultData.qaQuestions
       return {
         ...defaultData,
         ...parsed,
-        loveNotes: parsed.loveNotes?.length ? parsed.loveNotes : defaultData.loveNotes,
-        qaQuestions: parsed.qaQuestions?.length ? parsed.qaQuestions : defaultData.qaQuestions,
+        loveNotes: cleanLoveNotes,
+        qaQuestions: cleanQA,
         customQA: parsed.customQA?.length ? parsed.customQA : defaultData.customQA,
         galleryImages: parsed.galleryImages?.length ? parsed.galleryImages : defaultData.galleryImages,
         complaints: parsed.complaints?.length ? parsed.complaints : defaultData.complaints,
@@ -100,11 +129,16 @@ export async function syncFromGitHub() {
   try {
     const remote = await SyncAPI.getData()
     if (remote) {
+      // Detect corrupted emojis from sync and fall back to clean defaults
+      const cleanLoveNotes = (remote.loveNotes?.length && !hasCorruptedItems(remote.loveNotes, ['text']))
+        ? remote.loveNotes : defaultData.loveNotes
+      const cleanQA = (remote.qaQuestions?.length && !hasCorruptedItems(remote.qaQuestions, ['q', 'a']))
+        ? remote.qaQuestions : defaultData.qaQuestions
       const merged = {
         ...defaultData,
         ...remote,
-        loveNotes: remote.loveNotes?.length ? remote.loveNotes : defaultData.loveNotes,
-        qaQuestions: remote.qaQuestions?.length ? remote.qaQuestions : defaultData.qaQuestions,
+        loveNotes: cleanLoveNotes,
+        qaQuestions: cleanQA,
         customQA: remote.customQA?.length ? remote.customQA : defaultData.customQA,
         galleryImages: remote.galleryImages?.length ? remote.galleryImages : defaultData.galleryImages,
         complaints: remote.complaints?.length ? remote.complaints : defaultData.complaints,

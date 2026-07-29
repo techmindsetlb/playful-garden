@@ -181,23 +181,6 @@ export default function App() {
             ))}
           </div>
           <div style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
-            {syncConfigured && (
-              <>
-                <button className="nav-theme-btn" onClick={handleSyncFromGitHub} disabled={syncing} title="Sync from GitHub">
-                  📥
-                </button>
-                <button className="nav-theme-btn" onClick={handlePushToGitHub} disabled={syncing} title="Push to GitHub">
-                  📤
-                </button>
-              </>
-            )}
-            <button className="nav-theme-btn" onClick={() => exportToJSON()} title="Download backup">
-              💾
-            </button>
-            <button className="nav-theme-btn" onClick={() => importRef.current?.click()} title="Restore backup">
-              📂
-            </button>
-            <input type="file" accept=".json" ref={importRef} onChange={handleImport} style={{ display: 'none' }} />
             <button className="nav-theme-btn" onClick={toggleTheme} aria-label="Toggle theme">
               {theme === 'light' ? '🌙' : '☀️'}
             </button>
@@ -225,7 +208,10 @@ export default function App() {
           <div className="blob-wrapper">
             <JellyBlobMascot
               mood={blobMood}
-              onOverpoke={() => setBlobMood('happy')}
+              onOverpoke={(nextMood) => {
+                if (nextMood) setBlobMood(nextMood)
+              }}
+              happyEyes="star"
             />
           </div>
           <div className="blob-hint">
@@ -258,6 +244,7 @@ export default function App() {
               </p>
             )}
             <div style={{ marginTop: 16, display: 'flex', gap: 8, justifyContent: 'center', flexWrap: 'wrap' }}>
+              <input type="file" accept=".json" ref={importRef} onChange={handleImport} style={{ display: 'none' }} />
               {syncConfigured && (
                 <>
                   <button className="btn btn-outline" onClick={handleSyncFromGitHub} disabled={syncing} style={{ fontSize: '0.8rem', padding: '8px 16px' }}>

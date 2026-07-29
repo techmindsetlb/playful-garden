@@ -106,8 +106,8 @@ export const memories = [
   },
   {
     date: "May 2026",
-    title: "Through War & Hardship 🇱🇧",
-    emoji: "🇱🇧",
+    title: "Through War & Hardship — Lebanon 🇱🇧",
+    emoji: "❤️‍🩹",
     description: "We faced the war together. Displaced but never separated in spirit. Those were the first days she wore hijab — and she was the most beautiful I've ever seen.",
     color: "#f3e5f5"
   }
