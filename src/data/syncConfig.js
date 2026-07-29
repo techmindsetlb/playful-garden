@@ -2,9 +2,7 @@ const SYNC_CONFIG = {
   owner: 'techmindsetlb',
   repo: 'playful-garden',
   branch: 'main',
-  // Set this to your Cloudflare Worker URL after deploying worker.js
-  // Leave empty to use localStorage only
-  workerUrl: '',
+  workerUrl: 'https://playful-garden.techmindset-leb.workers.dev',
   // === Data Storage Paths ===
   dataPath: 'data/naghams-garden-data.json',
   // === App Settings ===
