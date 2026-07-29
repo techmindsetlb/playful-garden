@@ -3,6 +3,7 @@ import { PullCord } from 'pullcord'
 import { JellyBlobMascot } from 'feral-blob'
 import 'pullcord/pullcord.css'
 import 'feral-blob/blob.css'
+import PinLock from './components/PinLock.jsx'
 import Landing from './components/Landing.jsx'
 import LoveCounter from './components/LoveCounter.jsx'
 import ComplimentGenerator from './components/ComplimentGenerator.jsx'
@@ -11,14 +12,19 @@ import LoveNotes from './components/LoveNotes.jsx'
 import MiniGames from './components/MiniGames.jsx'
 import BookReader from './components/BookReader.jsx'
 import MemoriesTimeline from './components/MemoriesTimeline.jsx'
+import ComplaintsForm from './components/ComplaintsForm.jsx'
+import ComplimentsForm from './components/ComplimentsForm.jsx'
+import { exportToJSON, importFromJSON } from './data/appStore.js'
 import './App.css'
 
 export default function App() {
   const [theme, setTheme] = useState('light')
   const [entered, setEntered] = useState(false)
+  const [unlocked, setUnlocked] = useState(false)
   const [activeSection, setActiveSection] = useState('')
   const [blobMood, setBlobMood] = useState('happy')
   const headerRef = useRef(null)
+  const importRef = useRef(null)
 
   const toggleTheme = useCallback(() => {
     setTheme(prev => prev === 'light' ? 'dark' : 'light')
@@ -50,6 +56,25 @@ export default function App() {
     if (el) el.scrollIntoView({ behavior: 'smooth' })
   }
 
+  const handleImport = async (e) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    try {
+      await importFromJSON(file)
+      window.location.reload()
+    } catch (err) {
+      alert('Failed to import: ' + err.message)
+    }
+  }
+
+  if (!unlocked) {
+    return <PinLock onUnlock={() => setUnlocked(true)} />
+  }
+
+  if (!entered) {
+    return <Landing onStart={() => setEntered(true)} />
+  }
+
   const navItems = [
     { id: 'love-counter', label: '⏳ Time', emoji: '⏳' },
     { id: 'memories', label: '📖 Story', emoji: '📖' },
@@ -58,23 +83,19 @@ export default function App() {
     { id: 'blob', label: '🫧 Blob', emoji: '🫧' },
     { id: 'gallery', label: '📸 Photos', emoji: '📸' },
     { id: 'love-notes', label: '💌 Notes', emoji: '💌' },
+    { id: 'submitted-compliments', label: '💬 Say', emoji: '💬' },
+    { id: 'complaints', label: '😤 Moan', emoji: '😤' },
     { id: 'games', label: '🎮 Games', emoji: '🎮' },
   ]
 
-  if (!entered) {
-    return <Landing onStart={() => setEntered(true)} />
-  }
-
   return (
     <div className="app">
-      {/* Real FeralUI PullCord - auto positions at viewport top */}
       <PullCord
         onPull={toggleTheme}
         pulled={theme === 'dark'}
         ariaLabel="Toggle theme"
       />
 
-      {/* Navigation */}
       <nav className="nav" ref={headerRef}>
         <div className="nav-inner">
           <div className="nav-brand" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
@@ -92,18 +113,24 @@ export default function App() {
               </button>
             ))}
           </div>
-          <button className="nav-theme-btn" onClick={toggleTheme} aria-label="Toggle theme">
-            {theme === 'light' ? '🌙' : '☀️'}
-          </button>
+          <div style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
+            <button className="nav-theme-btn" onClick={() => exportToJSON()} title="Backup data">
+              💾
+            </button>
+            <button className="nav-theme-btn" onClick={() => importRef.current?.click()} title="Restore data">
+              📂
+            </button>
+            <input type="file" accept=".json" ref={importRef} onChange={handleImport} style={{ display: 'none' }} />
+            <button className="nav-theme-btn" onClick={toggleTheme} aria-label="Toggle theme">
+              {theme === 'light' ? '🌙' : '☀️'}
+            </button>
+          </div>
         </div>
       </nav>
 
-      {/* Main Content */}
       <main className="main">
         <div className="main-hero">
-          <h1 className="main-hero-title">
-            Hey Nagham 💕
-          </h1>
+          <h1 className="main-hero-title">Hey Nagham 💕</h1>
           <p className="main-hero-sub">
             Every flower in this garden blooms for you.
             <br />Explore, play, and smile — this is your corner of the internet. 🌻
@@ -115,7 +142,6 @@ export default function App() {
         <BookReader />
         <ComplimentGenerator />
 
-        {/* Blob section with real FeralUI JellyBlobMascot */}
         <section id="blob" className="section">
           <h2 className="section-title">Meet Blobby 💜</h2>
           <p className="section-subtitle">Click or poke her — see what happens!</p>
@@ -132,6 +158,8 @@ export default function App() {
 
         <PhotoGallery />
         <LoveNotes />
+        <ComplimentsForm />
+        <ComplaintsForm />
         <MiniGames />
 
         <footer className="footer">
@@ -147,6 +175,14 @@ export default function App() {
             <p className="footer-sub">
               For Nagham — always and forever
             </p>
+            <div style={{ marginTop: 16, display: 'flex', gap: 8, justifyContent: 'center' }}>
+              <button className="btn btn-outline" onClick={() => exportToJSON()} style={{ fontSize: '0.8rem', padding: '8px 16px' }}>
+                💾 Backup Data
+              </button>
+              <button className="btn btn-outline" onClick={() => importRef.current?.click()} style={{ fontSize: '0.8rem', padding: '8px 16px' }}>
+                📂 Restore Data
+              </button>
+            </div>
           </div>
         </footer>
       </main>

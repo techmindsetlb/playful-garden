@@ -17,11 +17,11 @@
   --pullcord-top: 70px;
   --pullcord-right: 5rem;
   --pullcord-z: 100;
-  --pullcord-ink: rgba(244, 143, 177, 0.5);
+  --pullcord-ink: rgba(128, 128, 128, 0.3);
 }
 
 [data-theme="dark"] {
-  --pullcord-ink: rgba(240, 98, 146, 0.6);
+  --pullcord-ink: rgba(200, 200, 200, 0.3);
 }
 
 @media (max-width: 768px) {
@@ -1432,6 +1432,194 @@
   max-height: 60vh;
   border-radius: 12px;
   object-fit: contain;
+}
+
+/* ============================================
+   PIN LOCK
+   ============================================ */
+.pinlock-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
+  padding: 24px;
+}
+
+.pinlock-card {
+  max-width: 360px;
+  width: 100%;
+  text-align: center;
+  padding: 40px 32px;
+}
+
+.pinlock-shake {
+  animation: shake 0.5s ease;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-10px); }
+  40% { transform: translateX(10px); }
+  60% { transform: translateX(-10px); }
+  80% { transform: translateX(10px); }
+}
+
+.pinlock-icon {
+  font-size: 3.5rem;
+  margin-bottom: 16px;
+  animation: float 3s ease-in-out infinite;
+}
+
+.pinlock-title {
+  font-family: 'Dancing Script', cursive;
+  font-size: 1.6rem;
+  color: var(--accent-pink-dark);
+  margin-bottom: 8px;
+}
+
+.pinlock-subtitle {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin-bottom: 28px;
+}
+
+.pinlock-inputs {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.pinlock-input {
+  width: 56px;
+  height: 64px;
+  border: 2px solid var(--border-color);
+  border-radius: 12px;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-size: 1.8rem;
+  font-weight: 700;
+  text-align: center;
+  outline: none;
+  transition: all 0.3s;
+}
+
+.pinlock-input:focus {
+  border-color: var(--accent-pink);
+  box-shadow: 0 0 0 3px rgba(244, 143, 177, 0.2);
+}
+
+.pinlock-error {
+  border-color: #ef5350 !important;
+  animation: shake 0.5s ease;
+}
+
+.pinlock-error-text {
+  color: #ef5350;
+  font-size: 0.85rem;
+  margin-bottom: 16px;
+}
+
+.pinlock-hint {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  font-size: 1.3rem;
+  margin-top: 16px;
+}
+
+/* ============================================
+   COMPLAINTS & COMPLIMENTS TABLES
+   ============================================ */
+.complaints-table-wrapper {
+  overflow-x: auto;
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.complaints-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+
+.complaints-table th {
+  background: linear-gradient(135deg, var(--accent-pink), var(--accent-yellow));
+  color: white;
+  padding: 12px 16px;
+  text-align: left;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.complaints-table th:first-child {
+  border-radius: 12px 0 0 0;
+}
+
+.complaints-table th:last-child {
+  border-radius: 0 12px 0 0;
+}
+
+.complaints-table td {
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  vertical-align: top;
+}
+
+.complaints-table tr:hover td {
+  background: rgba(244, 143, 177, 0.05);
+}
+
+.complaints-date {
+  white-space: nowrap;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.complaints-delete {
+  width: 26px;
+  height: 26px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(0,0,0,0.05);
+  font-size: 0.7rem;
+  cursor: pointer;
+  transition: all 0.3s;
+  color: var(--text-muted);
+}
+
+.complaints-delete:hover {
+  background: #ef5350;
+  color: white;
+}
+
+/* Gallery upload delete button */
+.gallery-delete-upload {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(239, 83, 80, 0.85);
+  color: white;
+  font-size: 0.75rem;
+  cursor: pointer;
+  z-index: 5;
+  opacity: 0;
+  transition: opacity 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.gallery-item:hover .gallery-delete-upload {
+  opacity: 1;
 }
 
 /* ============================================

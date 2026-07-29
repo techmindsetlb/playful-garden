@@ -1,126 +1,86 @@
-import { useState, useEffect, useRef, useCallback } from 'react'
+import { useState } from 'react'
+import { loadData } from '../data/appStore.js'
 
-// Heart Catcher Game
-function HeartCatcher() {
-  const [hearts, setHearts] = useState([])
+// Fun quiz with unlimited questions — users can add their own!
+function QAGame() {
+  const initialData = loadData()
+  const [customQuestions, setCustomQuestions] = useState(initialData.customQA || [])
+  const [newQ, setNewQ] = useState('')
+  const [newA, setNewA] = useState('')
+  const [showAddForm, setShowAddForm] = useState(false)
+  const allQuestions = [...initialData.qaQuestions, ...customQuestions]
+  const [currentQ, setCurrentQ] = useState(null)
+  const [revealed, setRevealed] = useState(false)
   const [score, setScore] = useState(0)
-  const [missed, setMissed] = useState(0)
+  const [shown, setShown] = useState([])
   const [gameOver, setGameOver] = useState(false)
-  const [gameStarted, setGameStarted] = useState(false)
-  const [basketX, setBasketX] = useState(50)
-  const basketXRef = useRef(50)
-  const maxMissed = 5
 
-  const spawnHeart = useCallback(() => {
-    setHearts(prev => {
-      if (prev.length > 30) return prev // cap hearts on screen
-      const x = Math.random() * 80 + 5
-      const emojis = ['💕', '❤️', '💖', '💗', '💓', '🌻', '✨']
-      return [...prev, {
-        id: Date.now() + Math.random(),
-        x,
-        y: -5,
-        emoji: emojis[Math.floor(Math.random() * emojis.length)],
-        speed: 1 + Math.random() * 1.5,
-      }]
-    })
-  }, [])
-
-  // Spawn hearts
-  useEffect(() => {
-    if (!gameStarted || gameOver) return
-    const interval = setInterval(spawnHeart, Math.max(350, 1200 - score * 30))
-    return () => clearInterval(interval)
-  }, [gameStarted, gameOver, spawnHeart, score])
-
-  // Game loop: move hearts, check collisions and misses
-  useEffect(() => {
-    if (!gameStarted || gameOver) return
-
-    const gameLoop = setInterval(() => {
-      let missedCount = 0
-
-      setHearts(prev => {
-        // Move hearts down
-        let updated = prev.map(h => ({
-          ...h,
-          y: h.y + h.speed * 1.5,
-        }))
-
-        // Check misses (hit the ground)
-        const missedHearts = updated.filter(h => h.y > 94)
-        missedCount = missedHearts.length
-
-        // Check catches (collision with basket)
-        updated = updated.filter(h => {
-          if (h.y > 80 && h.y < 95) {
-            const dist = Math.abs(h.x - basketXRef.current)
-            if (dist < 12) {
-              return false // caught!
-            }
-          }
-          return true
-        }).filter(h => h.y <= 94) // remove missed hearts
-
-        return updated
-      })
-
-      // Update score and misses
-      if (missedCount > 0) {
-        setMissed(m => {
-          const newMissed = m + missedCount
-          if (newMissed >= maxMissed) {
-            setGameOver(true)
-          }
-          return newMissed
-        })
-      }
-
-    }, 50)
-
-    return () => clearInterval(gameLoop)
-  }, [gameStarted, gameOver])
-
-  // Track basket position with mouse
-  useEffect(() => {
-    const handleMouseMove = (e) => {
-      const rect = document.querySelector('.game-playfield')?.getBoundingClientRect()
-      if (!rect) return
-      const x = ((e.clientX - rect.left) / rect.width) * 100
-      const clampedX = Math.max(5, Math.min(85, x))
-      basketXRef.current = clampedX
-      setBasketX(clampedX)
+  const getNewQuestion = () => {
+    const available = allQuestions.filter((_, i) => !shown.includes(i))
+    if (available.length === 0) {
+      setGameOver(true)
+      return
     }
-    window.addEventListener('mousemove', handleMouseMove)
-    return () => window.removeEventListener('mousemove', handleMouseMove)
-  }, [])
+    const randomIdx = Math.floor(Math.random() * available.length)
+    let count = -1
+    for (let i = 0; i < allQuestions.length; i++) {
+      if (!shown.includes(i)) count++
+      if (count === randomIdx) {
+        setCurrentQ({ ...allQuestions[i], index: i })
+        setShown(prev => [...prev, i])
+        break
+      }
+    }
+    setRevealed(false)
+  }
+
+  const addCustomQuestion = () => {
+    if (!newQ.trim() || !newA.trim()) return
+    const question = { q: newQ.trim(), a: newA.trim() }
+    setCustomQuestions(prev => {
+      const updated = [...prev, question]
+      const data = loadData()
+      data.customQA = updated
+      saveData(data)
+      return updated
+    })
+    setNewQ('')
+    setNewA('')
+    setShowAddForm(false)
+  }
 
   const startGame = () => {
     setScore(0)
-    setMissed(0)
+    setShown([])
     setGameOver(false)
-    setHearts([])
-    setGameStarted(true)
+    setRevealed(false)
+    setCurrentQ(null)
+    setTimeout(() => getNewQuestion(), 100)
+  }
+
+  const handleReveal = () => {
+    setRevealed(true)
+    setScore(s => s + 1)
   }
 
   return (
     <div className="game-card card">
       <h3 style={{ textAlign: 'center', marginBottom: 12, fontFamily: 'Dancing Script', fontSize: '1.5rem' }}>
-        💕 Catch the Hearts! 💕
+        🤔 Infinite Q&A Challenge
       </h3>
 
-      {!gameStarted ? (
+      {!currentQ && !gameOver ? (
         <div className="game-start">
-          <p className="game-desc">Move your mouse to catch falling hearts before they hit the ground! 🌟</p>
-          <button className="btn" onClick={startGame}>🎮 Play!</button>
+          <p className="game-desc">Test your knowledge of our beautiful love story! Answer as many questions as you can! 🏆</p>
+          <button className="btn" onClick={startGame}>🎮 Start Playing!</button>
         </div>
       ) : gameOver ? (
         <div className="game-over">
-          <p className="game-score-final">Score: {score} 💕</p>
+          <p className="game-score-final">🎉 You answered all {score} questions!</p>
           <p className="game-congrats">
-            {score > 20 ? "Amazing! You're a heart-catching pro! 🏆" :
-             score > 10 ? 'Great job! Love is in the air! 🌟' :
-             'Good try! Want to play again? 💪'}
+            {score === allQuestions.length ? "Perfect score! You know everything about us! 🏆💕" :
+             score > allQuestions.length / 2 ? "Great job! Our love story is forever! 🌟" :
+             "Good start! Want to play again? 💪"}
           </p>
           <div className="game-emoji-burst">
             {['🎉', '💕', '✨', '🥳', '💖'].map((e, i) => (
@@ -130,81 +90,124 @@ function HeartCatcher() {
           <button className="btn" onClick={startGame}>🔄 Play Again</button>
         </div>
       ) : (
-        <div className="game-area">
-          <div className="game-hud">
-            <span>Score: {score} 💕</span>
-            <span>Missed: {missed}/{maxMissed} ❌</span>
-          </div>
-          <div className="game-playfield">
-            {hearts.map(heart => (
-              <div
-                key={heart.id}
-                className="game-heart"
-                style={{ left: `${heart.x}%`, top: `${heart.y}%` }}
-              >
-                {heart.emoji}
-              </div>
-            ))}
-            <div className="game-basket" style={{ left: `${basketX}%` }}>
-              🧺
+        <div className="quiz-question">
+          <p className="quiz-q">{currentQ.q}</p>
+          {!revealed ? (
+            <div style={{ display: 'flex', justifyContent: 'center' }}>
+              <button className="btn" onClick={handleReveal}>
+                👀 Reveal Answer
+              </button>
             </div>
-          </div>
+          ) : (
+            <div className="quiz-result">
+              <p className="quiz-answer">{currentQ.a}</p>
+              <button className="btn" onClick={getNewQuestion}>
+                {shown.length < allQuestions.length ? 'Next ➡️' : '🏁 See Results'}
+              </button>
+            </div>
+          )}
+          <p style={{ textAlign: 'center', marginTop: 16, fontSize: '0.85rem', color: 'var(--text-muted)' }}>
+            Question {shown.length} of {allQuestions.length} • Score: {score}
+          </p>
         </div>
       )}
-    </div>
-  )
-}
 
-// Fun quiz
-function FunQuiz() {
-  const questions = [
-    { q: "What's Nagham's favorite drink?", a: "Cappuccino ☕", options: ["Cappuccino ☕", "Tea 🍵", "Soda 🥤", "Water 💧"] },
-    { q: "What flower reminds you of Nagham?", a: "Sunflower 🌻", options: ["Sunflower 🌻", "Rose 🌹", "Tulip 🌷", "Lily 🪷"] },
-    { q: "Nagham's laugh is...", a: "The cutest sound ever 🥰", options: ["The cutest sound ever 🥰", "Okay I guess 😅", "Loud 😆", "Silent 🤫"] },
-  ]
-  const [currentQ, setCurrentQ] = useState(0)
-  const [revealed, setRevealed] = useState(false)
-
-  return (
-    <div className="game-card card">
-      <h3 style={{ textAlign: 'center', marginBottom: 12, fontFamily: 'Dancing Script', fontSize: '1.5rem' }}>
-        🤔 How Well Do You Know Nagham?
-      </h3>
-      <div className="quiz-question">
-        <p className="quiz-q">{questions[currentQ].q}</p>
-        <div className="quiz-options">
-          {questions[currentQ].options.map((opt, i) => (
-            <button
-              key={i}
-              className={`btn btn-outline quiz-option ${revealed && opt === questions[currentQ].a ? 'quiz-correct' : ''}`}
-              onClick={() => setRevealed(true)}
-              disabled={revealed}
-            >
-              {opt}
-            </button>
-          ))}
-        </div>
-        {revealed && (
-          <div className="quiz-result">
-            <p className="quiz-answer">Answer: {questions[currentQ].a}</p>
-            <button
-              className="btn"
-              onClick={() => {
-                setCurrentQ((currentQ + 1) % questions.length)
-                setRevealed(false)
-              }}
-            >
-              {currentQ < questions.length - 1 ? 'Next ➡️' : '🔄 Start Over'}
+      {/* Add your own Q&A */}
+      <div style={{ marginTop: 20, borderTop: '1px solid var(--border-color)', paddingTop: 16 }}>
+        <button className="btn btn-outline" onClick={() => setShowAddForm(!showAddForm)} style={{ fontSize: '0.8rem' }}>
+          {showAddForm ? '✕ Cancel' : '✍️ Add your own Q&A'}
+        </button>
+        {showAddForm && (
+          <div style={{ marginTop: 12, display: 'flex', flexDirection: 'column', gap: 8 }}>
+            <input
+              type="text"
+              placeholder="Your question..."
+              value={newQ}
+              onChange={e => setNewQ(e.target.value)}
+              className="note-textarea"
+              style={{ minHeight: 'auto', padding: '10px 14px' }}
+            />
+            <input
+              type="text"
+              placeholder="The answer..."
+              value={newA}
+              onChange={e => setNewA(e.target.value)}
+              className="note-textarea"
+              style={{ minHeight: 'auto', padding: '10px 14px' }}
+              onKeyDown={e => e.key === 'Enter' && addCustomQuestion()}
+            />
+            <button className="btn" onClick={addCustomQuestion} disabled={!newQ.trim() || !newA.trim()}>
+              ➕ Add to Game
             </button>
           </div>
+        )}
+        {customQuestions.length > 0 && (
+          <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: 8 }}>
+            ✨ {customQuestions.length} custom question{customQuestions.length > 1 ? 's' : ''} added!
+          </p>
         )}
       </div>
     </div>
   )
 }
 
+// Claw machine from FeralUI
+function ClawMachine({ onToggle }) {
+  const [showCaptcha, setShowCaptcha] = useState(false)
+  const [verified, setVerified] = useState(false)
+
+  // Dynamic import to avoid issues if assets aren't ready
+  const [ClawCaptcha, setClawCaptcha] = useState(null)
+  const [loadError, setLoadError] = useState(false)
+
+  const loadCaptcha = async () => {
+    try {
+      const mod = await import('playcaptcha')
+      setClawCaptcha(() => mod.ClawCaptcha)
+      setShowCaptcha(true)
+    } catch (e) {
+      setLoadError(true)
+    }
+  }
+
+  if (loadError) return null
+
+  return (
+    <div className="game-card card">
+      <h3 style={{ textAlign: 'center', marginBottom: 12, fontFamily: 'Dancing Script', fontSize: '1.5rem' }}>
+        🎮 Claw Machine Challenge!
+      </h3>
+
+      {!showCaptcha ? (
+        <div className="game-start">
+          <p className="game-desc">
+            {verified
+              ? "You already proved your love! 🏆💕"
+              : "Catch the right toy to prove your love! Use arrow keys or joystick to move the claw 🦀"}
+          </p>
+          {!verified && (
+            <button className="btn" onClick={loadCaptcha}>
+              🦀 Play Claw Machine!
+            </button>
+          )}
+        </div>
+      ) : ClawCaptcha ? (
+        <div style={{ maxWidth: 400, margin: '0 auto' }}>
+          <ClawCaptcha
+            onVerify={() => {
+              setVerified(true)
+              setShowCaptcha(false)
+            }}
+            title="🎯 Grab the right toy for Nagham!"
+          />
+        </div>
+      ) : null}
+    </div>
+  )
+}
+
 export default function MiniGames() {
-  const [activeGame, setActiveGame] = useState('catcher')
+  const [activeGame, setActiveGame] = useState('qa')
 
   return (
     <section id="games" className="section">
@@ -213,23 +216,23 @@ export default function MiniGames() {
 
       <div className="game-tabs">
         <button
-          className={`btn ${activeGame === 'catcher' ? '' : 'btn-outline'}`}
-          onClick={() => setActiveGame('catcher')}
+          className={`btn ${activeGame === 'qa' ? '' : 'btn-outline'}`}
+          onClick={() => setActiveGame('qa')}
           style={{ fontSize: '0.85rem', padding: '8px 18px' }}
         >
-          💕 Heart Catcher
+          ❓ Q&A Challenge
         </button>
         <button
-          className={`btn ${activeGame === 'quiz' ? '' : 'btn-outline'}`}
-          onClick={() => setActiveGame('quiz')}
+          className={`btn ${activeGame === 'claw' ? '' : 'btn-outline'}`}
+          onClick={() => setActiveGame('claw')}
           style={{ fontSize: '0.85rem', padding: '8px 18px' }}
         >
-          🤔 Nagham Quiz
+          🦀 Claw Machine
         </button>
       </div>
 
       <div className="game-content" style={{ maxWidth: 500, margin: '0 auto' }}>
-        {activeGame === 'catcher' ? <HeartCatcher /> : <FunQuiz />}
+        {activeGame === 'qa' ? <QAGame /> : <ClawMachine />}
       </div>
     </section>
   )
