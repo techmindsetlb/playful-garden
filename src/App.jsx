@@ -14,7 +14,8 @@ import BookReader from './components/BookReader.jsx'
 import MemoriesTimeline from './components/MemoriesTimeline.jsx'
 import ComplaintsForm from './components/ComplaintsForm.jsx'
 import ComplimentsForm from './components/ComplimentsForm.jsx'
-import { exportToJSON, importFromJSON } from './data/appStore.js'
+import { exportToJSON, importFromJSON, syncFromGitHub, pushToGitHub, isSyncConfigured, getLastSyncTime } from './data/appStore.js'
+import SYNC_CONFIG from './data/syncConfig.js'
 import './App.css'
 
 export default function App() {
@@ -23,6 +24,8 @@ export default function App() {
   const [unlocked, setUnlocked] = useState(false)
   const [activeSection, setActiveSection] = useState('')
   const [blobMood, setBlobMood] = useState('happy')
+  const [syncStatus, setSyncStatus] = useState('')
+  const [syncing, setSyncing] = useState(false)
   const headerRef = useRef(null)
   const importRef = useRef(null)
 
@@ -66,6 +69,57 @@ export default function App() {
       alert('Failed to import: ' + err.message)
     }
   }
+
+  const handleSyncFromGitHub = async () => {
+    setSyncing(true)
+    setSyncStatus('Syncing...')
+    const result = await syncFromGitHub()
+    setSyncing(false)
+    if (result.ok) {
+      setSyncStatus('✅ Synced!')
+      setTimeout(() => setSyncStatus(''), 3000)
+      window.location.reload()
+    } else {
+      setSyncStatus('❌ ' + (result.message || 'Sync failed'))
+      setTimeout(() => setSyncStatus(''), 4000)
+    }
+  }
+
+  const handlePushToGitHub = async () => {
+    setSyncing(true)
+    setSyncStatus('Pushing...')
+    const result = await pushToGitHub()
+    setSyncing(false)
+    if (result.ok) {
+      setSyncStatus('✅ Pushed!')
+      setTimeout(() => setSyncStatus(''), 3000)
+    } else {
+      setSyncStatus('❌ ' + (result.message || 'Push failed'))
+      setTimeout(() => setSyncStatus(''), 4000)
+    }
+  }
+
+  const syncConfigured = isSyncConfigured()
+
+  // Auto-sync from GitHub on page load (background, then reload if data changed)
+  useEffect(() => {
+    if (!syncConfigured || !entered || !unlocked) return
+    // Check if we already synced recently (within last minute) to avoid loops
+    const lastSync = getLastSyncTime()
+    if (lastSync && Date.now() - new Date(lastSync).getTime() < 60000) return
+    setSyncStatus('🔄 Syncing...')
+    syncFromGitHub().then(result => {
+      if (result.ok) {
+        setSyncStatus('✅ Auto-synced')
+        // Reload to show fresh data (avoids stale component state)
+        setTimeout(() => window.location.reload(), 1500)
+      } else {
+        setSyncStatus('')
+      }
+    }).catch(() => {
+      setSyncStatus('')
+    })
+  }, [syncConfigured, entered, unlocked])
 
   if (!unlocked) {
     return <PinLock onUnlock={() => setUnlocked(true)} />
@@ -114,10 +168,20 @@ export default function App() {
             ))}
           </div>
           <div style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
-            <button className="nav-theme-btn" onClick={() => exportToJSON()} title="Backup data">
+            {syncConfigured && (
+              <>
+                <button className="nav-theme-btn" onClick={handleSyncFromGitHub} disabled={syncing} title="Sync from GitHub">
+                  📥
+                </button>
+                <button className="nav-theme-btn" onClick={handlePushToGitHub} disabled={syncing} title="Push to GitHub">
+                  📤
+                </button>
+              </>
+            )}
+            <button className="nav-theme-btn" onClick={() => exportToJSON()} title="Download backup">
               💾
             </button>
-            <button className="nav-theme-btn" onClick={() => importRef.current?.click()} title="Restore data">
+            <button className="nav-theme-btn" onClick={() => importRef.current?.click()} title="Restore backup">
               📂
             </button>
             <input type="file" accept=".json" ref={importRef} onChange={handleImport} style={{ display: 'none' }} />
@@ -175,12 +239,27 @@ export default function App() {
             <p className="footer-sub">
               For Nagham — always and forever
             </p>
-            <div style={{ marginTop: 16, display: 'flex', gap: 8, justifyContent: 'center' }}>
+            {syncStatus && (
+              <p style={{ fontSize: '0.85rem', color: 'var(--accent-pink)', marginTop: 12 }}>
+                {syncStatus}
+              </p>
+            )}
+            <div style={{ marginTop: 16, display: 'flex', gap: 8, justifyContent: 'center', flexWrap: 'wrap' }}>
+              {syncConfigured && (
+                <>
+                  <button className="btn btn-outline" onClick={handleSyncFromGitHub} disabled={syncing} style={{ fontSize: '0.8rem', padding: '8px 16px' }}>
+                    📥 Sync from GitHub
+                  </button>
+                  <button className="btn btn-outline" onClick={handlePushToGitHub} disabled={syncing} style={{ fontSize: '0.8rem', padding: '8px 16px' }}>
+                    📤 Push to GitHub
+                  </button>
+                </>
+              )}
               <button className="btn btn-outline" onClick={() => exportToJSON()} style={{ fontSize: '0.8rem', padding: '8px 16px' }}>
-                💾 Backup Data
+                💾 Download Backup
               </button>
               <button className="btn btn-outline" onClick={() => importRef.current?.click()} style={{ fontSize: '0.8rem', padding: '8px 16px' }}>
-                📂 Restore Data
+                📂 Restore Backup
               </button>
             </div>
           </div>

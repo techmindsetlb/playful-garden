@@ -1,4 +1,8 @@
-const STORAGE_KEY = 'naghams-garden-data'
+import SyncAPI from './syncAPI.js'
+import SYNC_CONFIG from './syncConfig.js'
+
+const STORAGE_KEY = SYNC_CONFIG.cacheKey || 'naghams-garden-data'
+const LAST_SYNC_KEY = SYNC_CONFIG.lastSyncKey || 'naghams-garden-last-sync'
 
 const defaultData = {
   loveNotes: [
@@ -25,28 +29,135 @@ const defaultData = {
     { q: "Where is your favorite restaurant?", a: "Al Jawad 🍽️" },
     { q: "What did Nagham write for Abbass's birthday?", a: "A whole book! 'After the Rain Sunshine' 📖" },
   ],
-  customQA: []
+  customQA: [],
+  lastUpdated: null,
 }
 
+let syncInProgress = false
+
+/**
+ * Load data from localStorage (fast cache), then try to sync from GitHub
+ */
 export function loadData() {
   try {
     const stored = localStorage.getItem(STORAGE_KEY)
     if (stored) {
       const parsed = JSON.parse(stored)
-      return { ...defaultData, ...parsed, loveNotes: parsed.loveNotes || defaultData.loveNotes }
+      return {
+        ...defaultData,
+        ...parsed,
+        loveNotes: parsed.loveNotes?.length ? parsed.loveNotes : defaultData.loveNotes,
+        qaQuestions: parsed.qaQuestions?.length ? parsed.qaQuestions : defaultData.qaQuestions,
+        customQA: parsed.customQA?.length ? parsed.customQA : defaultData.customQA,
+        galleryImages: parsed.galleryImages?.length ? parsed.galleryImages : defaultData.galleryImages,
+        complaints: parsed.complaints?.length ? parsed.complaints : defaultData.complaints,
+        submittedCompliments: parsed.submittedCompliments?.length ? parsed.submittedCompliments : defaultData.submittedCompliments,
+      }
     }
-  } catch (e) { console.warn('Failed to load data:', e) }
-  return { ...defaultData, loveNotes: [...defaultData.loveNotes] }
+  } catch (e) {
+    console.warn('Failed to load from localStorage:', e)
+  }
+  return structuredClone(defaultData)
 }
 
+/**
+ * Save to localStorage immediately + sync to GitHub in background
+ */
 export function saveData(data) {
+  data.lastUpdated = new Date().toISOString()
+  let localOk = false
+  // Save to localStorage immediately
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(data))
-    return true
+    localOk = true
   } catch (e) {
-    console.error('Failed to save data:', e)
-    return false
+    console.error('Failed to save to localStorage:', e)
   }
+  // Sync to GitHub in background (non-blocking)
+  if (SYNC_CONFIG.workerUrl && !syncInProgress) {
+    syncInProgress = true
+    SyncAPI.saveData(data)
+      .then((ok) => {
+        if (ok) {
+          localStorage.setItem(LAST_SYNC_KEY, new Date().toISOString())
+        }
+      })
+      .catch(() => {})
+      .finally(() => {
+        syncInProgress = false
+      })
+  }
+  return localOk
+}
+
+/**
+ * Force sync from GitHub (overwrites local data with remote)
+ */
+export async function syncFromGitHub() {
+  if (!SYNC_CONFIG.workerUrl) {
+    return { ok: false, message: 'No Worker URL configured' }
+  }
+  try {
+    const remote = await SyncAPI.getData()
+    if (remote) {
+      const merged = {
+        ...defaultData,
+        ...remote,
+        loveNotes: remote.loveNotes?.length ? remote.loveNotes : defaultData.loveNotes,
+        qaQuestions: remote.qaQuestions?.length ? remote.qaQuestions : defaultData.qaQuestions,
+        customQA: remote.customQA?.length ? remote.customQA : defaultData.customQA,
+        galleryImages: remote.galleryImages?.length ? remote.galleryImages : defaultData.galleryImages,
+        complaints: remote.complaints?.length ? remote.complaints : defaultData.complaints,
+        submittedCompliments: remote.submittedCompliments?.length ? remote.submittedCompliments : defaultData.submittedCompliments,
+      }
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(merged))
+      localStorage.setItem(LAST_SYNC_KEY, new Date().toISOString())
+      return { ok: true, data: merged }
+    }
+    // No remote data exists yet — push local data to GitHub
+    const local = loadData()
+    const pushed = await SyncAPI.saveData(local)
+    if (pushed) {
+      localStorage.setItem(LAST_SYNC_KEY, new Date().toISOString())
+    }
+    return { ok: pushed, data: local }
+  } catch (err) {
+    console.error('Sync from GitHub failed:', err)
+    return { ok: false, message: err.message }
+  }
+}
+
+/**
+ * Push local data to GitHub
+ */
+export async function pushToGitHub() {
+  if (!SYNC_CONFIG.workerUrl) {
+    return { ok: false, message: 'No Worker URL configured' }
+  }
+  try {
+    const local = loadData()
+    const ok = await SyncAPI.saveData(local)
+    if (ok) {
+      localStorage.setItem(LAST_SYNC_KEY, new Date().toISOString())
+    }
+    return { ok, message: ok ? 'Synced!' : 'Sync failed' }
+  } catch (err) {
+    return { ok: false, message: err.message }
+  }
+}
+
+/**
+ * Check if Worker is configured
+ */
+export function isSyncConfigured() {
+  return !!SYNC_CONFIG.workerUrl
+}
+
+/**
+ * Get last sync time
+ */
+export function getLastSyncTime() {
+  return localStorage.getItem(LAST_SYNC_KEY)
 }
 
 export function exportToJSON() {
