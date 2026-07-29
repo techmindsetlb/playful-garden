@@ -11,58 +11,27 @@
 }
 
 /* ============================================
-   PULL CORD
+   FERALUI PULL CORD (real npm package)
    ============================================ */
-.pullcord-fixed {
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: 100;
-  width: 100px;
-  height: 180px;
-  pointer-events: none;
+:root {
+  --pullcord-top: 70px;
+  --pullcord-right: 5rem;
+  --pullcord-z: 100;
+  --pullcord-ink: rgba(244, 143, 177, 0.5);
 }
 
-.pullcord-wrapper {
-  pointer-events: all;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+[data-theme="dark"] {
+  --pullcord-ink: rgba(240, 98, 146, 0.6);
 }
 
-.pullcord-canvas {
-  width: 240px;
-  height: 280px;
-  cursor: grab;
-  touch-action: none;
-}
-
-.pullcord-canvas:active {
-  cursor: grabbing;
-}
-
-.pullcord-info {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  margin-top: -10px;
-}
-
-.pullcord-label {
-  font-size: 0.65rem;
-  color: var(--text-muted);
-  white-space: nowrap;
-}
-
-.pullcord-theme {
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: var(--accent-pink);
+@media (max-width: 768px) {
+  :root {
+    --pullcord-right: 1rem;
+  }
 }
 
 /* ============================================
-   NAVIGATION
+   NAVIGATION — mobile-first
    ============================================ */
 .nav {
   position: fixed;
@@ -80,16 +49,16 @@
 .nav-inner {
   max-width: 1100px;
   margin: 0 auto;
-  padding: 12px 24px;
+  padding: clamp(8px, 2vw, 12px) clamp(12px, 3vw, 24px);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
+  gap: 8px;
 }
 
 .nav-brand {
   font-family: 'Dancing Script', cursive;
-  font-size: 1.3rem;
+  font-size: clamp(1rem, 3vw, 1.3rem);
   font-weight: 700;
   cursor: pointer;
   white-space: nowrap;
@@ -106,7 +75,7 @@
 
 .nav-links {
   display: flex;
-  gap: 4px;
+  gap: 2px;
   overflow-x: auto;
   scrollbar-width: none;
   -ms-overflow-style: none;
@@ -119,14 +88,14 @@
 .nav-link {
   display: flex;
   align-items: center;
-  gap: 4px;
-  padding: 6px 12px;
+  gap: 3px;
+  padding: clamp(4px, 1vw, 8px) clamp(6px, 1.5vw, 14px);
   border: none;
   border-radius: 20px;
   background: transparent;
   color: var(--text-secondary);
   font-family: 'Quicksand', sans-serif;
-  font-size: 0.78rem;
+  font-size: clamp(0.65rem, 1.5vw, 0.8rem);
   font-weight: 500;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -146,16 +115,29 @@
 }
 
 .nav-link-icon {
-  font-size: 1rem;
+  font-size: clamp(0.8rem, 2vw, 1rem);
+}
+
+.nav-link-label {
+  display: none;
+}
+
+@media (min-width: 640px) {
+  .nav-link-label {
+    display: inline;
+  }
+  .nav-links {
+    gap: 4px;
+  }
 }
 
 .nav-theme-btn {
-  width: 40px;
-  height: 40px;
+  width: clamp(32px, 5vw, 40px);
+  height: clamp(32px, 5vw, 40px);
   border: none;
   border-radius: 50%;
   background: rgba(244, 143, 177, 0.15);
-  font-size: 1.2rem;
+  font-size: clamp(1rem, 2.5vw, 1.2rem);
   cursor: pointer;
   transition: all 0.3s ease;
   flex-shrink: 0;
@@ -256,7 +238,7 @@
 
 .title-line {
   font-family: 'Quicksand', sans-serif;
-  font-size: 1.2rem;
+  font-size: clamp(0.9rem, 2.5vw, 1.2rem);
   color: var(--text-secondary);
   opacity: 0;
   transform: translateY(30px);
@@ -265,7 +247,7 @@
 
 .title-name {
   font-family: 'Dancing Script', cursive;
-  font-size: 4rem;
+  font-size: clamp(2.5rem, 8vw, 4rem);
   font-weight: 700;
   background: linear-gradient(135deg, var(--accent-pink), var(--accent-yellow), var(--accent-sunflower));
   -webkit-background-clip: text;
@@ -370,32 +352,15 @@
    ============================================ */
 .main-hero {
   text-align: center;
-  padding: 100px 24px 60px;
+  padding: clamp(60px, 12vw, 100px) clamp(16px, 4vw, 24px) clamp(30px, 6vw, 60px);
   position: relative;
   overflow: hidden;
 }
 
-.main-hero-sunflowers {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 60px;
-  pointer-events: none;
-}
-
-.hero-sunflower {
-  position: absolute;
-  bottom: 0;
-  font-size: 2rem;
-  animation: float 3s ease-in-out infinite;
-  opacity: 0.5;
-}
-
 .main-hero-title {
   font-family: 'Dancing Script', cursive;
-  font-size: 3.5rem;
-  margin-bottom: 16px;
+  font-size: clamp(2rem, 7vw, 3.5rem);
+  margin-bottom: clamp(12px, 2vw, 16px);
   background: linear-gradient(135deg, var(--accent-pink), var(--accent-yellow));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -404,14 +369,15 @@
 }
 
 .main-hero-sub {
-  font-size: 1.1rem;
+  font-size: clamp(0.9rem, 2.5vw, 1.1rem);
   color: var(--text-secondary);
   line-height: 1.6;
+  padding: 0 8px;
   animation: fadeInUp 0.8s ease 0.2s both;
 }
 
 /* ============================================
-   LOVE COUNTER
+   LOVE COUNTER (mobile-friendly)
    ============================================ */
 .counter-container {
   opacity: 0;
@@ -428,8 +394,9 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 12px;
-  margin-bottom: 40px;
+  gap: clamp(4px, 2vw, 12px);
+  margin-bottom: clamp(20px, 5vw, 40px);
+  flex-wrap: wrap;
 }
 
 .counter-unit {
@@ -437,11 +404,11 @@
   flex-direction: column;
   align-items: center;
   background: var(--bg-card);
-  border-radius: 16px;
-  padding: 20px 24px;
+  border-radius: clamp(12px, 3vw, 16px);
+  padding: clamp(12px, 3vw, 20px) clamp(14px, 4vw, 24px);
   box-shadow: var(--shadow-md);
   border: 1px solid var(--border-color);
-  min-width: 90px;
+  min-width: clamp(55px, 15vw, 90px);
   transition: all 0.3s;
 }
 
@@ -452,7 +419,7 @@
 
 .counter-value {
   font-family: 'Dancing Script', cursive;
-  font-size: 2.8rem;
+  font-size: clamp(1.6rem, 6vw, 2.8rem);
   font-weight: 700;
   background: linear-gradient(135deg, var(--accent-pink), var(--accent-yellow));
   -webkit-background-clip: text;
@@ -462,16 +429,16 @@
 }
 
 .counter-label {
-  font-size: 0.8rem;
+  font-size: clamp(0.6rem, 1.5vw, 0.8rem);
   color: var(--text-muted);
   text-transform: uppercase;
-  letter-spacing: 2px;
+  letter-spacing: clamp(1px, 0.3vw, 2px);
   margin-top: 4px;
 }
 
 .counter-sep {
   font-family: 'Dancing Script', cursive;
-  font-size: 2.5rem;
+  font-size: clamp(1.5rem, 5vw, 2.5rem);
   color: var(--accent-pink);
   animation: pulse-soft 1s ease-in-out infinite;
   margin-top: -20px;
@@ -600,83 +567,40 @@
 }
 
 /* ============================================
-   BLOB
+   FERALUI BLOB (real npm package: feral-blob)
    ============================================ */
-.blob-container {
-  position: relative;
-  height: 350px;
+.blob-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 280px;
   margin: 0 auto;
-  max-width: 500px;
+  max-width: 400px;
   border-radius: 24px;
   background: radial-gradient(ellipse at center, rgba(244, 143, 177, 0.08), transparent);
-  overflow: hidden;
-  cursor: pointer;
 }
 
-.blob-body {
-  position: absolute;
-  width: 180px;
-  height: 180px;
-  transform: translate(-50%, -50%);
-  transition: transform 0.1s ease;
-  user-select: none;
+.blob-hint {
+  text-align: center;
+  margin-top: 12px;
+  font-size: 0.85rem;
+  color: var(--text-muted);
 }
 
-.blob-svg {
-  width: 100%;
-  height: 100%;
-  filter: drop-shadow(0 8px 24px rgba(244, 143, 177, 0.3));
+.blob-hint strong {
+  color: var(--accent-pink);
+  text-transform: capitalize;
 }
 
-.blob-bounce {
-  animation: pulse-soft 0.4s ease;
-}
-
-.blob-face {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.blob-expression {
-  font-size: 2.5rem;
-  margin-top: -10px;
-  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
-  animation: float 2s ease-in-out infinite;
-}
-
-.blob-hearts {
-  position: absolute;
-  top: -20px;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  gap: 4px;
-}
-
-.blob-heart {
-  font-size: 1.2rem;
-  animation: float 1s ease-in-out infinite;
-}
-
-.blob-status {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  margin-top: 16px;
-}
-
-.blob-status-icon {
-  font-size: 1.5rem;
-}
-
-.blob-status-text {
-  color: var(--text-secondary);
-  font-size: 0.95rem;
-  font-style: italic;
+/* Theme the blob with Nagham's colors */
+.blob-wrapper {
+  --jelly-body-light: #fce4ec;
+  --jelly-body-mid: #f48fb1;
+  --jelly-body-dark: #d81b60;
+  --jelly-outline: #c2185b;
+  --jelly-cheek: #ff8a80;
+  --jelly-eye: #3e2723;
+  --jelly-glow: #ffd54f;
 }
 
 /* ============================================
@@ -721,15 +645,7 @@
   overflow: hidden;
 }
 
-.gallery-emoji {
-  font-size: 3.5rem;
-  transition: transform 0.3s;
-  filter: drop-shadow(0 4px 8px rgba(0,0,0,0.1));
-}
-
-.gallery-item:hover .gallery-emoji {
-  transform: scale(1.2);
-}
+/* Gallery images */
 
 .gallery-label {
   padding: 12px 14px;
@@ -811,11 +727,7 @@
   margin-bottom: 8px;
 }
 
-.lightbox-hint {
-  color: var(--text-muted);
-  font-size: 0.85rem;
-  font-style: italic;
-}
+/* Lightbox - clean */
 
 /* ============================================
    LOVE NOTES
@@ -1583,12 +1495,9 @@
     transform: rotate(0deg) !important;
   }
 
-  .pullcord-fixed {
-    display: none;
-  }
-
-  .blob-container {
-    height: 280px;
+  /* Hide pullcord labels on mobile */
+  .blob-wrapper {
+    min-height: 200px;
   }
 
   /* Timeline mobile: switch to stacked left-aligned */

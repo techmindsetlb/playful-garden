@@ -1,9 +1,11 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
+import { PullCord } from 'pullcord'
+import { JellyBlobMascot } from 'feral-blob'
+import 'pullcord/pullcord.css'
+import 'feral-blob/blob.css'
 import Landing from './components/Landing.jsx'
-import PullCord from './components/PullCord.jsx'
 import LoveCounter from './components/LoveCounter.jsx'
 import ComplimentGenerator from './components/ComplimentGenerator.jsx'
-import Blob from './components/Blob.jsx'
 import PhotoGallery from './components/PhotoGallery.jsx'
 import LoveNotes from './components/LoveNotes.jsx'
 import MiniGames from './components/MiniGames.jsx'
@@ -15,6 +17,7 @@ export default function App() {
   const [theme, setTheme] = useState('light')
   const [entered, setEntered] = useState(false)
   const [activeSection, setActiveSection] = useState('')
+  const [blobMood, setBlobMood] = useState('happy')
   const headerRef = useRef(null)
 
   const toggleTheme = useCallback(() => {
@@ -38,7 +41,7 @@ export default function App() {
       })
       setActiveSection(current)
     }
-    window.addEventListener('scroll', handleScroll)
+    window.addEventListener('scroll', handleScroll, { passive: true })
     return () => window.removeEventListener('scroll', handleScroll)
   }, [entered])
 
@@ -64,10 +67,12 @@ export default function App() {
 
   return (
     <div className="app">
-      {/* Theme Toggle Pull Cord - side fixed */}
-      <div className="pullcord-fixed">
-        <PullCord theme={theme} onToggle={toggleTheme} />
-      </div>
+      {/* Real FeralUI PullCord - auto positions at viewport top */}
+      <PullCord
+        onPull={toggleTheme}
+        pulled={theme === 'dark'}
+        ariaLabel="Toggle theme"
+      />
 
       {/* Navigation */}
       <nav className="nav" ref={headerRef}>
@@ -87,7 +92,7 @@ export default function App() {
               </button>
             ))}
           </div>
-          <button className="nav-theme-btn" onClick={toggleTheme}>
+          <button className="nav-theme-btn" onClick={toggleTheme} aria-label="Toggle theme">
             {theme === 'light' ? '🌙' : '☀️'}
           </button>
         </div>
@@ -95,15 +100,7 @@ export default function App() {
 
       {/* Main Content */}
       <main className="main">
-        {/* Mini hero */}
         <div className="main-hero">
-          <div className="main-hero-sunflowers">
-            <span className="hero-sunflower" style={{ left: '5%', animationDelay: '0s' }}>🌻</span>
-            <span className="hero-sunflower" style={{ left: '25%', animationDelay: '0.8s' }}>🌻</span>
-            <span className="hero-sunflower" style={{ left: '50%', animationDelay: '1.6s' }}>🌻</span>
-            <span className="hero-sunflower" style={{ left: '72%', animationDelay: '0.4s' }}>🌻</span>
-            <span className="hero-sunflower" style={{ left: '92%', animationDelay: '1.2s' }}>🌻</span>
-          </div>
           <h1 className="main-hero-title">
             Hey Nagham 💕
           </h1>
@@ -117,12 +114,26 @@ export default function App() {
         <MemoriesTimeline />
         <BookReader />
         <ComplimentGenerator />
-        <Blob theme={theme} />
+
+        {/* Blob section with real FeralUI JellyBlobMascot */}
+        <section id="blob" className="section">
+          <h2 className="section-title">Meet Blobby 💜</h2>
+          <p className="section-subtitle">Click or poke her — see what happens!</p>
+          <div className="blob-wrapper">
+            <JellyBlobMascot
+              mood={blobMood}
+              onOverpoke={() => setBlobMood('happy')}
+            />
+          </div>
+          <div className="blob-hint">
+            Mood: <strong>{blobMood}</strong>
+          </div>
+        </section>
+
         <PhotoGallery />
         <LoveNotes />
         <MiniGames />
 
-        {/* Footer */}
         <footer className="footer">
           <div className="footer-content">
             <div className="footer-sunflowers">
