@@ -1,0 +1,217 @@
+:root {
+  /* Light theme - warm pink & yellow with cappuccino */
+  --bg-primary: #fff5f0;
+  --bg-secondary: #fce4ec;
+  --bg-card: #ffffff;
+  --bg-gradient-start: #fce4ec;
+  --bg-gradient-end: #fff3e0;
+  --text-primary: #3e2723;
+  --text-secondary: #6d4c41;
+  --text-muted: #a1887f;
+  --accent-pink: #f48fb1;
+  --accent-pink-dark: #d81b60;
+  --accent-yellow: #ffd54f;
+  --accent-yellow-dark: #f9a825;
+  --accent-sunflower: #ffb300;
+  --accent-cappuccino: #a1887f;
+  --accent-cappuccino-light: #d7ccc8;
+  --shadow-sm: 0 2px 8px rgba(62, 39, 35, 0.08);
+  --shadow-md: 0 4px 20px rgba(62, 39, 35, 0.12);
+  --shadow-lg: 0 8px 40px rgba(62, 39, 35, 0.16);
+  --border-color: rgba(244, 143, 177, 0.3);
+  --blob-color-1: #f48fb1;
+  --blob-color-2: #ffd54f;
+  --blob-color-3: #ffb300;
+  --cord-color: #d7ccc8;
+  --cord-knob: #f48fb1;
+  --nav-bg: rgba(255, 245, 240, 0.85);
+  --modal-overlay: rgba(62, 39, 35, 0.5);
+}
+
+[data-theme="dark"] {
+  --bg-primary: #1a1210;
+  --bg-secondary: #2c1f1a;
+  --bg-card: #3e2723;
+  --bg-gradient-start: #2c1f1a;
+  --bg-gradient-end: #1a1210;
+  --text-primary: #fce4ec;
+  --text-secondary: #d7ccc8;
+  --text-muted: #8d6e63;
+  --accent-pink: #f06292;
+  --accent-pink-dark: #ec407a;
+  --accent-yellow: #ffd54f;
+  --accent-yellow-dark: #ffb300;
+  --accent-sunflower: #ff8f00;
+  --accent-cappuccino: #8d6e63;
+  --accent-cappuccino-light: #5d4037;
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 20px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 8px 40px rgba(0, 0, 0, 0.5);
+  --border-color: rgba(244, 143, 177, 0.15);
+  --blob-color-1: #f06292;
+  --blob-color-2: #ffd54f;
+  --blob-color-3: #ff8f00;
+  --cord-color: #5d4037;
+  --cord-knob: #f06292;
+  --nav-bg: rgba(26, 18, 16, 0.85);
+  --modal-overlay: rgba(0, 0, 0, 0.7);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'Quicksand', sans-serif;
+  background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
+  color: var(--text-primary);
+  min-height: 100vh;
+  transition: background 0.5s ease, color 0.5s ease;
+  overflow-x: hidden;
+}
+
+h1, h2, h3, h4 {
+  font-family: 'Dancing Script', cursive;
+}
+
+::selection {
+  background: var(--accent-pink);
+  color: white;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-primary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--accent-pink);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-pink-dark);
+}
+
+/* Utility animations */
+@keyframes float {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-10px) rotate(2deg); }
+}
+
+@keyframes pulse-soft {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeInScale {
+  from { opacity: 0; transform: scale(0.8); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes spin-slow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes petal-fall {
+  0% { transform: translateY(-10vh) rotate(0deg); opacity: 0; }
+  10% { opacity: 1; }
+  100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+}
+
+.section {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 80px 24px;
+  animation: fadeInUp 0.6s ease forwards;
+}
+
+.section-title {
+  font-size: 2.5rem;
+  text-align: center;
+  margin-bottom: 12px;
+  background: linear-gradient(135deg, var(--accent-pink), var(--accent-yellow));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.section-subtitle {
+  text-align: center;
+  color: var(--text-secondary);
+  font-size: 1.1rem;
+  margin-bottom: 48px;
+}
+
+/* Button styles */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 28px;
+  border: none;
+  border-radius: 50px;
+  font-family: 'Quicksand', sans-serif;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: linear-gradient(135deg, var(--accent-pink), var(--accent-yellow));
+  color: white;
+  box-shadow: var(--shadow-sm);
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.btn:active {
+  transform: translateY(0);
+}
+
+.btn-outline {
+  background: transparent;
+  border: 2px solid var(--accent-pink);
+  color: var(--accent-pink);
+}
+
+.btn-outline:hover {
+  background: var(--accent-pink);
+  color: white;
+}
+
+/* Card styles */
+.card {
+  background: var(--bg-card);
+  border-radius: 20px;
+  padding: 32px;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border-color);
+  transition: all 0.3s ease;
+}
+
+.card:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
