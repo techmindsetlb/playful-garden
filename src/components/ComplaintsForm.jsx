@@ -1,12 +1,10 @@
 import { useState, useEffect } from 'react'
 import { loadData, saveData } from '../data/appStore.js'
 
-const noteColors = ['#fff8e1', '#fce4ec', '#e8f5e9', '#fff3e0', '#f3e5f5']
-
 export default function ComplaintsForm() {
   const [complaints, setComplaints] = useState([])
   const [text, setText] = useState('')
-  const [name, setName] = useState('')
+  const [about, setAbout] = useState('Abbass')
 
   useEffect(() => {
     const data = loadData()
@@ -18,10 +16,9 @@ export default function ComplaintsForm() {
     if (!text.trim()) return
     const newComplaint = {
       id: Date.now(),
-      name: name.trim() || 'Anonymous',
+      about,
       text: text.trim(),
       date: new Date().toLocaleDateString(),
-      color: noteColors[Math.floor(Math.random() * noteColors.length)],
     }
     const updated = [newComplaint, ...complaints]
     setComplaints(updated)
@@ -42,20 +39,20 @@ export default function ComplaintsForm() {
   return (
     <section id="complaints" className="section">
       <h2 className="section-title">😤 Complaints Department</h2>
-      <p className="section-subtitle">Got something to complain about? Let it out! (All in good fun 😂)</p>
+      <p className="section-subtitle">Nagham, got a complaint about Abbass? Let it out! (All in good fun 😂)</p>
 
       <form className="card" onSubmit={handleSubmit} style={{ maxWidth: 500, margin: '0 auto 32px' }}>
         <div style={{ marginBottom: 12 }}>
-          <input
-            type="text"
-            placeholder="Your name (optional)"
-            value={name}
-            onChange={e => setName(e.target.value)}
+          <select
+            value={about}
+            onChange={e => setAbout(e.target.value)}
             className="note-textarea"
-            style={{ marginBottom: 8, minHeight: 'auto', padding: '10px 14px' }}
-          />
+            style={{ marginBottom: 8, minHeight: 'auto', padding: '10px 14px', cursor: 'pointer' }}
+          >
+            <option value="Abbass">About Abbass 💁</option>
+          </select>
           <textarea
-            placeholder="What's your complaint? 🙈"
+            placeholder="What did Abbass do this time? 🙈"
             value={text}
             onChange={e => setText(e.target.value)}
             className="note-textarea"
@@ -77,7 +74,7 @@ export default function ComplaintsForm() {
             <thead>
               <tr>
                 <th>#</th>
-                <th>Name</th>
+                <th>About</th>
                 <th>Complaint 😤</th>
                 <th>Date</th>
                 <th></th>
@@ -87,7 +84,7 @@ export default function ComplaintsForm() {
               {complaints.map((c, i) => (
                 <tr key={c.id}>
                   <td>{i + 1}</td>
-                  <td>{c.name}</td>
+                  <td>{c.about || c.name || 'Abbass'}</td>
                   <td>{c.text}</td>
                   <td className="complaints-date">{c.date}</td>
                   <td>

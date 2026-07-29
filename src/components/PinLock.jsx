@@ -59,8 +59,10 @@ export default function PinLock({ onUnlock }) {
             <input
               key={i}
               ref={el => inputs.current[i] = el}
-              type="password"
+              type="text"
               inputMode="numeric"
+              pattern="[0-9]*"
+              autoComplete="off"
               maxLength={1}
               value={digit}
               onChange={e => handleChange(i, e.target.value)}

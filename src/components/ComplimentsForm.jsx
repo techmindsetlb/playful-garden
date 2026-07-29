@@ -4,7 +4,7 @@ import { loadData, saveData } from '../data/appStore.js'
 export default function ComplimentsForm() {
   const [compliments, setCompliments] = useState([])
   const [text, setText] = useState('')
-  const [name, setName] = useState('')
+  const [from, setFrom] = useState('Nagham')
 
   useEffect(() => {
     const data = loadData()
@@ -16,7 +16,7 @@ export default function ComplimentsForm() {
     if (!text.trim()) return
     const newCompliment = {
       id: Date.now(),
-      name: name.trim() || 'Anonymous 💕',
+      from,
       text: text.trim(),
       date: new Date().toLocaleDateString(),
     }
@@ -38,21 +38,26 @@ export default function ComplimentsForm() {
 
   return (
     <section id="submitted-compliments" className="section">
-      <h2 className="section-title">💝 Write a Compliment</h2>
-      <p className="section-subtitle">Tell Nagham something lovely! These will be saved forever 💕</p>
+      <h2 className="section-title">💝 Compliments Corner</h2>
+      <p className="section-subtitle">Sweet words for each other — from Nagham or Abbass! ✨</p>
 
       <form className="card" onSubmit={handleSubmit} style={{ maxWidth: 500, margin: '0 auto 32px' }}>
         <div style={{ marginBottom: 12 }}>
-          <input
-            type="text"
-            placeholder="Your name (optional)"
-            value={name}
-            onChange={e => setName(e.target.value)}
+          <select
+            value={from}
+            onChange={e => setFrom(e.target.value)}
             className="note-textarea"
-            style={{ marginBottom: 8, minHeight: 'auto', padding: '10px 14px' }}
-          />
+            style={{ marginBottom: 8, minHeight: 'auto', padding: '10px 14px', cursor: 'pointer' }}
+          >
+            <option value="Nagham">You (Nagham) 💕</option>
+            <option value="Abbass">Abbass 💙</option>
+          </select>
           <textarea
-            placeholder="Write something sweet for Nagham... ✨"
+            placeholder={
+              from === 'Nagham'
+                ? "Write something sweet to Abbass... ✨"
+                : "Write something sweet to Nagham... ✨"
+            }
             value={text}
             onChange={e => setText(e.target.value)}
             className="note-textarea"
@@ -84,7 +89,7 @@ export default function ComplimentsForm() {
               {compliments.map((c, i) => (
                 <tr key={c.id}>
                   <td>{i + 1}</td>
-                  <td>{c.name}</td>
+                  <td>{c.from || c.name || 'Nagham'}</td>
                   <td>{c.text}</td>
                   <td className="complaints-date">{c.date}</td>
                   <td>

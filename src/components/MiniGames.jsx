@@ -155,17 +155,22 @@ function QAGame() {
 function ClawMachine({ onToggle }) {
   const [showCaptcha, setShowCaptcha] = useState(false)
   const [verified, setVerified] = useState(false)
-
-  // Dynamic import to avoid issues if assets aren't ready
-  const [ClawCaptcha, setClawCaptcha] = useState(null)
+  const [CC, setCC] = useState(null)
   const [loadError, setLoadError] = useState(false)
+
+  // Determine the correct asset base path (GitHub Pages uses /playful-garden/)
+  const basePath = import.meta.env?.BASE_URL || '/'
+  const assetBase = `${basePath}toys/`
 
   const loadCaptcha = async () => {
     try {
       const mod = await import('playcaptcha')
-      setClawCaptcha(() => mod.ClawCaptcha)
+      // Also import the CSS
+      await import('playcaptcha/clawcaptcha.css')
+      setCC(() => mod.ClawCaptcha)
       setShowCaptcha(true)
     } catch (e) {
+      console.warn('ClawCaptcha load failed:', e)
       setLoadError(true)
     }
   }
@@ -191,14 +196,15 @@ function ClawMachine({ onToggle }) {
             </button>
           )}
         </div>
-      ) : ClawCaptcha ? (
+      ) : CC ? (
         <div style={{ maxWidth: 400, margin: '0 auto' }}>
-          <ClawCaptcha
+          <CC
             onVerify={() => {
               setVerified(true)
               setShowCaptcha(false)
             }}
             title="🎯 Grab the right toy for Nagham!"
+            assetBase={assetBase}
           />
         </div>
       ) : null}
