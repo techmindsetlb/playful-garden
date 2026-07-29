@@ -3,16 +3,16 @@ import { loadData, saveData } from '../data/appStore.js'
 
 // Default photos from the public folder
 const defaultPhotos = [
-  { id: 'built-1', src: '/playful-garden/images/WhatsApp Image 2026-07-29 at 8.48.21 PM.jpeg', label: 'A beautiful moment together 🌻', category: 'us' },
-  { id: 'built-2', src: '/playful-garden/images/WhatsApp Image 2026-07-29 at 8.48.21 PM (1).jpeg', label: 'Our smiles say it all 💕', category: 'us' },
-  { id: 'built-3', src: '/playful-garden/images/WhatsApp Image 2026-07-29 at 8.48.21 PM (2).jpeg', label: 'Cherished memories 📸', category: 'us' },
-  { id: 'built-4', src: '/playful-garden/images/WhatsApp Image 2026-07-29 at 8.48.21 PM (3).jpeg', label: 'Love in every glance 💖', category: 'us' },
-  { id: 'built-5', src: '/playful-garden/images/WhatsApp Image 2026-07-29 at 8.48.22 PM.jpeg', label: 'Sunflowers and sunshine 🌻', category: 'sunflowers' },
-  { id: 'built-6', src: '/playful-garden/images/WhatsApp Image 2026-07-29 at 8.51.14 PM.jpeg', label: 'Cappuccino dates ☕', category: 'dates' },
-  { id: 'built-7', src: '/playful-garden/images/WhatsApp Image 2026-07-29 at 8.51.15 PM.jpeg', label: 'Adventures together 🌍', category: 'dates' },
-  { id: 'built-8', src: '/playful-garden/images/WhatsApp Image 2026-07-29 at 8.51.16 PM.jpeg', label: 'Our happy place 💕', category: 'us' },
-  { id: 'built-9', src: '/playful-garden/images/WhatsApp Image 2026-07-29 at 8.54.13 PM.jpeg', label: 'Date nights ✨', category: 'dates' },
-  { id: 'built-10', src: '/playful-garden/images/WhatsApp Image 2026-07-29 at 8.54.13 PM (1).jpeg', label: 'Making memories 🥰', category: 'us' },
+  { id: 'built-1', src: '/playful-garden/images/WhatsApp%20Image%202026-07-29%20at%208.48.21%20PM.jpg', label: 'A beautiful moment together 🌻', category: 'us' },
+  { id: 'built-2', src: '/playful-garden/images/WhatsApp%20Image%202026-07-29%20at%208.48.21%20PM%20(1).jpg', label: 'Our smiles say it all 💕', category: 'us' },
+  { id: 'built-3', src: '/playful-garden/images/WhatsApp%20Image%202026-07-29%20at%208.48.21%20PM%20(2).jpg', label: 'Cherished memories 📸', category: 'us' },
+  { id: 'built-4', src: '/playful-garden/images/WhatsApp%20Image%202026-07-29%20at%208.48.21%20PM%20(3).jpg', label: 'Love in every glance 💖', category: 'us' },
+  { id: 'built-5', src: '/playful-garden/images/WhatsApp%20Image%202026-07-29%20at%208.48.22%20PM.jpg', label: 'Sunflowers and sunshine 🌻', category: 'sunflowers' },
+  { id: 'built-6', src: '/playful-garden/images/WhatsApp%20Image%202026-07-29%20at%208.51.14%20PM.jpg', label: 'Cappuccino dates ☕', category: 'dates' },
+  { id: 'built-7', src: '/playful-garden/images/WhatsApp%20Image%202026-07-29%20at%208.51.15%20PM.jpg', label: 'Adventures together 🌍', category: 'dates' },
+  { id: 'built-8', src: '/playful-garden/images/WhatsApp%20Image%202026-07-29%20at%208.51.16%20PM.jpg', label: 'Our happy place 💕', category: 'us' },
+  { id: 'built-9', src: '/playful-garden/images/WhatsApp%20Image%202026-07-29%20at%208.54.13%20PM.jpg', label: 'Date nights ✨', category: 'dates' },
+  { id: 'built-10', src: '/playful-garden/images/WhatsApp%20Image%202026-07-29%20at%208.54.13%20PM%20(1).jpg', label: 'Making memories 🥰', category: 'us' },
 ]
 
 export default function PhotoGallery() {
