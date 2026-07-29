@@ -17,11 +17,11 @@
   --pullcord-top: 70px;
   --pullcord-right: 5rem;
   --pullcord-z: 100;
-  --pullcord-ink: transparent;
+  --pullcord-ink: rgba(180, 180, 190, 0.4);
 }
 
 [data-theme="dark"] {
-  --pullcord-ink: transparent;
+  --pullcord-ink: rgba(220, 220, 230, 0.35);
 }
 
 @media (max-width: 768px) {

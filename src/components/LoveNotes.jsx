@@ -1,51 +1,44 @@
 import { useState, useEffect } from 'react'
-
-const initialNotes = [
-  {
-    id: 1,
-    text: "Nagham, you make every day feel like a sunflower bloom 🌻",
-    color: '#fff8e1',
-    x: 10, y: 10,
-    rot: -3,
-  },
-  {
-    id: 2,
-    text: "I love our cappuccino dates more than words can say ☕💕",
-    color: '#fce4ec',
-    x: 30, y: 40,
-    rot: 2,
-  },
-  {
-    id: 3,
-    text: "You're the most beautiful person inside and out ✨",
-    color: '#e8f5e9',
-    x: 50, y: 20,
-    rot: -1,
-  },
-  {
-    id: 4,
-    text: "Every moment with you is a treasure I'll keep forever 💎",
-    color: '#fff3e0',
-    x: 65, y: 50,
-    rot: 4,
-  },
-  {
-    id: 5,
-    text: "Your smile lights up my whole world 😊🌟",
-    color: '#f3e5f5',
-    x: 15, y: 65,
-    rot: -2,
-  },
-]
+import { loadData, saveData } from '../data/appStore.js'
 
 const noteColors = ['#fff8e1', '#fce4ec', '#e8f5e9', '#fff3e0', '#f3e5f5', '#e0f7fa', '#fbe9e7']
 const randomRot = () => Math.floor(Math.random() * 8) - 4
 
 export default function LoveNotes() {
-  const [notes, setNotes] = useState(initialNotes)
+  const [notes, setNotes] = useState([])
   const [newNote, setNewNote] = useState('')
   const [showForm, setShowForm] = useState(false)
   const [flyingNotes, setFlyingNotes] = useState([])
+  const [syncStatus, setSyncStatus] = useState('')
+
+  useEffect(() => {
+    const data = loadData()
+    if (data.loveNotes?.length) {
+      setNotes(data.loveNotes.map(n => ({
+        ...n,
+        x: n.x || Math.floor(Math.random() * 60) + 5,
+        y: n.y || Math.floor(Math.random() * 50) + 10,
+        rot: n.rot ?? randomRot(),
+        color: n.color || noteColors[Math.floor(Math.random() * noteColors.length)],
+      })))
+    }
+  }, [])
+
+  const persistNotes = async (updatedNotes) => {
+    const data = loadData()
+    data.loveNotes = updatedNotes
+    saveData(data)
+    // Also push to GitHub immediately
+    const { pushToGitHub } = await import('../data/appStore.js')
+    const result = await pushToGitHub()
+    if (result.ok) {
+      setSyncStatus('✅ Synced')
+      setTimeout(() => setSyncStatus(''), 2000)
+    } else {
+      setSyncStatus('❌ Sync failed')
+      setTimeout(() => setSyncStatus(''), 3000)
+    }
+  }
 
   const handleAddNote = () => {
     if (!newNote.trim()) return
@@ -57,13 +50,17 @@ export default function LoveNotes() {
       y: Math.floor(Math.random() * 50) + 10,
       rot: randomRot(),
     }
-    setNotes(prev => [note, ...prev])
+    const updated = [note, ...notes]
+    setNotes(updated)
     setNewNote('')
     setShowForm(false)
+    persistNotes(updated)
   }
 
   const handleDeleteNote = (id) => {
-    setNotes(prev => prev.filter(n => n.id !== id))
+    const updated = notes.filter(n => n.id !== id)
+    setNotes(updated)
+    persistNotes(updated)
   }
 
   // Floating decorative notes
@@ -89,6 +86,12 @@ export default function LoveNotes() {
     <section id="love-notes" className="section">
       <h2 className="section-title">Love Notes 💌</h2>
       <p className="section-subtitle">Little messages from the heart</p>
+
+      {syncStatus && (
+        <p style={{ textAlign: 'center', fontSize: '0.85rem', color: 'var(--accent-pink)', marginBottom: 12 }}>
+          {syncStatus}
+        </p>
+      )}
 
       <div className="notes-actions">
         <button className="btn" onClick={() => setShowForm(!showForm)}>
@@ -117,12 +120,17 @@ export default function LoveNotes() {
       )}
 
       <div className="notes-board">
+        {notes.length === 0 && (
+          <p style={{ textAlign: 'center', color: 'var(--text-muted)', padding: 40 }}>
+            No love notes yet... write one! 💌
+          </p>
+        )}
         {notes.map((note) => (
           <div
             key={note.id}
             className="note-sticky"
             style={{
-              background: note.color,
+              background: note.color || '#fff8e1',
               left: `${note.x}%`,
               top: `${note.y}%`,
               transform: `rotate(${note.rot}deg)`,

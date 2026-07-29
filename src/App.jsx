@@ -14,20 +14,29 @@ import BookReader from './components/BookReader.jsx'
 import MemoriesTimeline from './components/MemoriesTimeline.jsx'
 import ComplaintsForm from './components/ComplaintsForm.jsx'
 import ComplimentsForm from './components/ComplimentsForm.jsx'
-import { exportToJSON, importFromJSON, syncFromGitHub, pushToGitHub, isSyncConfigured, getLastSyncTime } from './data/appStore.js'
+import { loadData, exportToJSON, importFromJSON, syncFromGitHub, pushToGitHub, isSyncConfigured, getLastSyncTime } from './data/appStore.js'
 import SYNC_CONFIG from './data/syncConfig.js'
 import './App.css'
 
 export default function App() {
   const [theme, setTheme] = useState('light')
-  const [entered, setEntered] = useState(false)
-  const [unlocked, setUnlocked] = useState(false)
+  const [entered, setEntered] = useState(() => sessionStorage.getItem('ng_entered') === 'true')
+  const [unlocked, setUnlocked] = useState(() => sessionStorage.getItem('ng_unlocked') === 'true')
   const [activeSection, setActiveSection] = useState('')
   const [blobMood, setBlobMood] = useState('happy')
   const [syncStatus, setSyncStatus] = useState('')
   const [syncing, setSyncing] = useState(false)
   const headerRef = useRef(null)
   const importRef = useRef(null)
+
+  const handleUnlock = () => {
+    sessionStorage.setItem('ng_unlocked', 'true')
+    setUnlocked(true)
+  }
+  const handleEnter = () => {
+    sessionStorage.setItem('ng_entered', 'true')
+    setEntered(true)
+  }
 
   const toggleTheme = useCallback(() => {
     setTheme(prev => prev === 'light' ? 'dark' : 'light')
@@ -101,18 +110,22 @@ export default function App() {
 
   const syncConfigured = isSyncConfigured()
 
-  // Auto-sync from GitHub on page load (background, then reload if data changed)
+  // Auto-sync from GitHub on page load — compares lastUpdated to avoid unecessary reloads
   useEffect(() => {
     if (!syncConfigured || !entered || !unlocked) return
-    // Check if we already synced recently (within last minute) to avoid loops
-    const lastSync = getLastSyncTime()
-    if (lastSync && Date.now() - new Date(lastSync).getTime() < 60000) return
+    const before = loadData()
+    const beforeTime = before.lastUpdated
     setSyncStatus('🔄 Syncing...')
     syncFromGitHub().then(result => {
-      if (result.ok) {
-        setSyncStatus('✅ Auto-synced')
-        // Reload to show fresh data (avoids stale component state)
-        setTimeout(() => window.location.reload(), 1500)
+      if (result.ok && result.data) {
+        // Only reload if data actually changed on GitHub
+        if (result.data.lastUpdated && result.data.lastUpdated !== beforeTime) {
+          setSyncStatus('✅ Synced! Reloading...')
+          // sessionStorage preserves unlock/enter state across reload
+          setTimeout(() => window.location.reload(), 1000)
+        } else {
+          setSyncStatus('')
+        }
       } else {
         setSyncStatus('')
       }
@@ -122,11 +135,11 @@ export default function App() {
   }, [syncConfigured, entered, unlocked])
 
   if (!unlocked) {
-    return <PinLock onUnlock={() => setUnlocked(true)} />
+    return <PinLock onUnlock={handleUnlock} />
   }
 
   if (!entered) {
-    return <Landing onStart={() => setEntered(true)} />
+    return <Landing onStart={handleEnter} />
   }
 
   const navItems = [
