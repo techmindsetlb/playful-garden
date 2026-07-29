@@ -54,7 +54,10 @@ const SyncAPI = {
       }
 
       const body = await res.json()
-      const decoded = atob(body.content.replace(/\n/g, ''))
+      // atob decodes to Latin-1, but our content is UTF-8 (emojis!)
+      // Use decodeURIComponent + escape to properly convert Latin-1 → UTF-8
+      const binary = atob(body.content.replace(/\n/g, ''))
+      const decoded = decodeURIComponent(escape(binary))
       return JSON.parse(decoded)
     } catch (err) {
       console.warn('SyncAPI.getData failed:', err)
