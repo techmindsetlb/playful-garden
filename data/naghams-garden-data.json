@@ -2,90 +2,83 @@
   "loveNotes": [
     {
       "id": 1,
-      "text": "Nagham, you make every day feel like a sunflower bloom Ã°ÂÂÂ»",
+      "text": "Nagham, you make every day feel like a sunflower bloom 🌻",
       "color": "#fff8e1"
     },
     {
       "id": 2,
-      "text": "I love our cappuccino dates more than words can say Ã¢ÂÂÃ°ÂÂÂ",
+      "text": "I love our cappuccino dates more than words can say ☕️💕",
       "color": "#fce4ec"
     },
     {
       "id": 3,
-      "text": "You're the most beautiful person inside and out Ã¢ÂÂ¨",
+      "text": "You’re the most beautiful person inside and out ✨",
       "color": "#e8f5e9"
     },
     {
       "id": 4,
-      "text": "Every moment with you is a treasure Ã°ÂÂÂ",
+      "text": "Every moment with you is a treasure 💎",
       "color": "#fff3e0"
     },
     {
       "id": 5,
-      "text": "Your smile lights up my whole world Ã°ÂÂÂÃ°ÂÂÂ",
+      "text": "Your smile lights up my whole world 😊🌟",
       "color": "#f3e5f5"
     }
   ],
   "complaints": [],
-  "submittedCompliments": [
-    {
-      "id": 1785353850959,
-      "from": "Abbass",
-      "text": "I love you",
-      "date": "7/29/2026"
-    }
-  ],
+  "submittedCompliments": [],
   "galleryImages": [],
   "qaQuestions": [
     {
       "q": "What's Nagham's favorite drink?",
-      "a": "Cappuccino Ã¢ÂÂ"
+      "a": "Cappuccino ☕"
     },
     {
       "q": "What flower reminds you of Nagham?",
-      "a": "Sunflower Ã°ÂÂÂ»"
+      "a": "Sunflower 🌻"
     },
     {
       "q": "What's the best thing about Nagham?",
-      "a": "Everything! Ã°ÂÂÂ"
+      "a": "Everything! 💕"
     },
     {
       "q": "Where was your first date?",
-      "a": "Donia CafÃÂ© Ã°ÂÂÂ»"
+      "a": "Donia Café 🌻"
     },
     {
       "q": "What's Nagham's business called?",
-      "a": "Ehsas Ã°ÂÂÂ¯Ã¯Â¸Â"
+      "a": "Ehsas 🕯️"
     },
     {
       "q": "What did Nagham call Abbass by mistake?",
-      "a": "Ahmad Ã°ÂÂÂ"
+      "a": "Ahmad 😂"
     },
     {
       "q": "What film did you watch together on Discord?",
-      "a": "Elemental Ã°ÂÂÂ¥Ã°ÂÂÂ§"
+      "a": "Elemental 🔥💧"
     },
     {
       "q": "What color did Abbass wear on the first date?",
-      "a": "Yellow Ã°ÂÂÂ"
+      "a": "Yellow 💛"
     },
     {
       "q": "What date did you get engaged?",
-      "a": "August 23, 2025 Ã°ÂÂÂ"
+      "a": "August 23, 2025 💍"
     },
     {
       "q": "What's the motorcycle model Abbass bought?",
-      "a": "Haojue Lindy 125cc Ã°ÂÂÂÃ¯Â¸Â"
+      "a": "Haojue Lindy 125cc 🏍️"
     },
     {
       "q": "Where is your favorite restaurant?",
-      "a": "Al Jawad Ã°ÂÂÂ½Ã¯Â¸Â"
+      "a": "Al Jawad 🍽️"
     },
     {
       "q": "What did Nagham write for Abbass's birthday?",
-      "a": "A whole book! 'After the Rain Sunshine' Ã°ÂÂÂ"
+      "a": "A whole book! 'After the Rain Sunshine' 📖"
     }
   ],
   "customQA": [],
-  "lastUpdated": "2026-07-29T19:37:30.960Z"
+  "lastUpdated": null
 }
