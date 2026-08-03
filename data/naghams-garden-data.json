@@ -27,7 +27,14 @@
     }
   ],
   "complaints": [],
-  "submittedCompliments": [],
+  "submittedCompliments": [
+    {
+      "id": 1785764075166,
+      "from": "Nagham",
+      "text": "enta atyb caramel latteee",
+      "date": "8/3/2026"
+    }
+  ],
   "galleryImages": [],
   "qaQuestions": [
     {
@@ -80,5 +87,5 @@
     }
   ],
   "customQA": [],
-  "lastUpdated": null
+  "lastUpdated": "2026-08-03T13:34:35.179Z"
 }
